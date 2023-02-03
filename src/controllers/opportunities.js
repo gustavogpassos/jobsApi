@@ -52,5 +52,31 @@ module.exports = {
                 }
             )
     },
-    update: (req, res) => {},
+    update: async (req, res) => {
+        const { id } = req.params
+        const { title, description, endAt } = req.body
+
+        const newData = {}
+        if (title) newData.title = title
+        if (description) newData.description = description
+        if (endAt) newData.endAt = endAt
+
+        await prisma.opportunities
+            .update({
+                data: {
+                    title: title,
+                },
+                where: {
+                    id: id,
+                },
+            })
+            .then(
+                (data) => {
+                    res.status(203).json(data)
+                },
+                (err) => {
+                    res.status(400).json(err)
+                }
+            )
+    },
 }
