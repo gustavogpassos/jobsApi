@@ -1,61 +1,134 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
-exports.findAll = async (req, res) => {
-    console.log(req)
-    const companies = await prisma.company.findMany()
-
-    res.status(200).json(companies)
-}
-
-exports.create = async (req, res) => {
-    const { name, cnpj, email, address, description } = req.body
-
-    const newCompany = await prisma.company.create({
-        data: {
-            name,
-            email,
-            address,
-            description,
-            cnpj,
-        },
-    })
-
-    res.status(201).json(newCompany)
-}
-
-exports.findById = async (req, res) => {
-    const { _id } = req.params
-
-    const company = await prisma.company.findUnique({
-        where: { id: _id },
-    })
-
-    res.status(200).json(company)
-}
-
-exports.search = async (req, res) => {
-    const { search } = req.body
-
-    const companies = await prisma.company.findMany({
-        where: {
-            OR: [
-                {
-                    name: { contains: search },
+module.exports = {
+    findAll: async (req, res) => {
+        await prisma.company
+            .findMany({
+                select: {
+                    name: true,
+                    description: true,
+                    email: true,
+                    address: true,
+                    cnpj: true,
                 },
-                {
-                    description: { contains: search },
+            })
+            .then(
+                (data) => {
+                    res.status(201).json(data)
                 },
-            ],
-        },
-        select: {
-            name: true,
-            description: true,
-            email: true,
-            address: true,
-            cnpj: true,
-        },
-    })
+                (err) => {
+                    res.status(400).json(err)
+                }
+            )
+    },
+    create: async (req, res) => {
+        const { name, cnpj, email, address, description } = req.body
 
-    res.status(200).json(companies)
+        await prisma.company
+            .create({
+                data: {
+                    name,
+                    email,
+                    address,
+                    description,
+                    cnpj,
+                },
+                select: {
+                    name: true,
+                    description: true,
+                    email: true,
+                    address: true,
+                    cnpj: true,
+                },
+            })
+            .then(
+                (data) => {
+                    res.status(201).json(data)
+                },
+                (err) => {
+                    res.status(400).json(err)
+                }
+            )
+    },
+    findById: async (req, res) => {
+        const { _id } = req.params
+        await prisma.company
+            .findUnique({
+                where: { id: _id },
+                select: {
+                    name: true,
+                    description: true,
+                    email: true,
+                    address: true,
+                    cnpj: true,
+                },
+            })
+            .then(
+                (data) => {
+                    res.status(201).json(data)
+                },
+                (err) => {
+                    res.status(400).json(err)
+                }
+            )
+    },
+    search: async (req, res) => {
+        const { search } = req.body
+        await prisma.company
+            .findMany({
+                where: {
+                    OR: [
+                        {
+                            name: { contains: search },
+                        },
+                        {
+                            description: { contains: search },
+                        },
+                    ],
+                },
+                select: {
+                    name: true,
+                    description: true,
+                    email: true,
+                    address: true,
+                    cnpj: true,
+                },
+            })
+            .then(
+                (data) => {
+                    res.status(201).json(data)
+                },
+                (err) => {
+                    res.status(400).json(err)
+                }
+            )
+    },
+    update: async (req, res) => {
+        const { id } = req.params
+        const body = req.body
+        await prisma.company
+            .update({
+                data: {
+                    ...body,
+                },
+                where: {
+                    id: id,
+                },
+                select: {
+                    name: true,
+                    description: true,
+                    address: true,
+                    cnpj: true,
+                },
+            })
+            .then(
+                (data) => {
+                    res.status(200).json(data)
+                },
+                (err) => {
+                    res.status(400).json(err)
+                }
+            )
+    },
 }
