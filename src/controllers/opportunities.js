@@ -4,9 +4,7 @@ const prisma = new PrismaClient()
 module.exports = {
     create: async (req, res) => {
         const { title, description, companyId, endAt } = req.body
-
         const endDate = new Date(endAt)
-
         await prisma.opportunities
             .create({
                 data: {
@@ -54,17 +52,12 @@ module.exports = {
     },
     update: async (req, res) => {
         const { id } = req.params
-        const { title, description, endAt } = req.body
-
-        const newData = {}
-        if (title) newData.title = title
-        if (description) newData.description = description
-        if (endAt) newData.endAt = endAt
+        const { body } = req
 
         await prisma.opportunities
             .update({
                 data: {
-                    title: title,
+                    ...body,
                 },
                 where: {
                     id: id,
