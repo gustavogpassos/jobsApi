@@ -3,15 +3,23 @@ const prisma = new PrismaClient()
 
 module.exports = {
     create: async (req, res) => {
-        const { title, description, companyId, endAt } = req.body
-        const endDate = new Date(endAt)
+        var { body } = req
+        body.endAt = new Date(body.endAt)
         await prisma.opportunities
             .create({
                 data: {
-                    title,
-                    description,
-                    companyId,
-                    endAt: endDate,
+                    ...body,
+                },
+                select: {
+                    title: true,
+                    description: true,
+                    createdAt: true,
+                    endAt: true,
+                    company: {
+                        select: {
+                            name: true,
+                        },
+                    },
                 },
             })
             .then(
@@ -23,22 +31,53 @@ module.exports = {
                 }
             )
     },
-    findAll: async (req, res) => {
-        await prisma.opportunities.findMany({}).then(
-            (data) => {
-                res.status(200).json(data)
-            },
-            (err) => {
-                res.status(400).json(err)
-            }
-        )
-    },
-    findById: async (req, res) => {
+    update: async (req, res) => {
         const { id } = req.params
+        var { body } = req
+        body.endAt = new Date(body.endAt)
+
         await prisma.opportunities
-            .findUnique({
+            .update({
+                data: {
+                    ...body,
+                },
                 where: {
                     id: id,
+                },
+                select: {
+                    title: true,
+                    description: true,
+                    createdAt: true,
+                    endAt: true,
+                    company: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            })
+            .then(
+                (data) => {
+                    res.status(203).json(data)
+                },
+                (err) => {
+                    res.status(400).json(err)
+                }
+            )
+    },
+    getAll: async (req, res) => {
+        await prisma.opportunities
+            .findMany({
+                select: {
+                    title: true,
+                    description: true,
+                    createdAt: true,
+                    endAt: true,
+                    company: {
+                        select: {
+                            name: true,
+                        },
+                    },
                 },
             })
             .then(
@@ -50,22 +89,56 @@ module.exports = {
                 }
             )
     },
-    update: async (req, res) => {
+    getById: async (req, res) => {
         const { id } = req.params
-        const { body } = req
-
         await prisma.opportunities
-            .update({
-                data: {
-                    ...body,
-                },
+            .findUnique({
                 where: {
                     id: id,
+                },
+                select: {
+                    title: true,
+                    description: true,
+                    createdAt: true,
+                    endAt: true,
+                    company: {
+                        select: {
+                            name: true,
+                        },
+                    },
                 },
             })
             .then(
                 (data) => {
-                    res.status(203).json(data)
+                    res.status(200).json(data)
+                },
+                (err) => {
+                    res.status(400).json(err)
+                }
+            )
+    },
+    getByCompanyId: async (req, res) => {
+        const { id } = req.params
+        await prisma.opportunities
+            .findMany({
+                where: {
+                    companyId: id,
+                },
+                select: {
+                    title: true,
+                    description: true,
+                    createdAt: true,
+                    endAt: true,
+                    company: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            })
+            .then(
+                (data) => {
+                    res.status(200).json(data)
                 },
                 (err) => {
                     res.status(400).json(err)
