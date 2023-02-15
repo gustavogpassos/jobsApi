@@ -10,6 +10,7 @@ module.exports = {
                     ...body,
                 },
                 select: {
+                    id: true,
                     name: true,
                     description: true,
                     email: true,
@@ -38,6 +39,7 @@ module.exports = {
                     id: id,
                 },
                 select: {
+                    id: true,
                     name: true,
                     description: true,
                     address: true,
@@ -74,6 +76,7 @@ module.exports = {
         await prisma.company
             .findMany({
                 select: {
+                    id: true,
                     name: true,
                     description: true,
                     email: true,
@@ -96,6 +99,7 @@ module.exports = {
             .findUnique({
                 where: { id: _id },
                 select: {
+                    id: true,
                     name: true,
                     description: true,
                     email: true,
@@ -119,14 +123,21 @@ module.exports = {
                 where: {
                     OR: [
                         {
-                            name: { contains: search },
+                            name: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
                         },
                         {
-                            description: { contains: search },
+                            description: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
                         },
                     ],
                 },
                 select: {
+                    id: true,
                     name: true,
                     description: true,
                     email: true,
