@@ -4,10 +4,11 @@ const opportunitiesRouter = Router()
 
 const controller = require('./../controllers/opportunities')
 
-opportunitiesRouter.get('/', controller.getAll)
-opportunitiesRouter.get('/:id', controller.getById)
 opportunitiesRouter.post('/create', controller.create)
 opportunitiesRouter.patch('/:id', controller.update)
-opportunitiesRouter.get('/company/:id', controller.getByCompanyId)
+opportunitiesRouter.post('/search', controller.search)
+opportunitiesRouter.get('/', controller.getAll)
+opportunitiesRouter.get('/:id', controller.getById)
+opportunitiesRouter.get('/company/:id', controller.getByCompany)
 
 module.exports = opportunitiesRouter
